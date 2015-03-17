@@ -1,18 +1,33 @@
 ﻿using ICities;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace DayNightCycleMod
 {
     public class Mod : IUserMod
     {
         public string Name { get { return "Day/Night"; } }
-        public string Description { get { return "Adds day-night cycle"; } }
+        public string Description { get { return "Adds day-night Cycle"; } }
     }
 
-    public class ModThreading : ThreadingExtensionBase
+    public class ModLoading : LoadingExtensionBase
     {
-        public override void OnUpdate(float realTimeDelta, float simulationTimeDelta)
+        private DayNightCycle _cycle;
+        public override void OnLevelLoaded(LoadMode mode)
         {
-            DayNightCycle.Instance.Update(simulationTimeDelta);
+            if (mode != LoadMode.NewGame && mode != LoadMode.LoadGame)
+                return;
+
+            var sunLight = Object.FindObjectOfType<Light>();
+            var sun = sunLight.gameObject;
+            _cycle = sun.AddComponent<DayNightCycle>();
+            _cycle.Init(sunLight, managers.threading);
+        }
+
+        public override void OnLevelUnloading()
+        {
+            _cycle.enabled = false;
+            _cycle.GetOptions().Serialize();
         }
     }
 }
