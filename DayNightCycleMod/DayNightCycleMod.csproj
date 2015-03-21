@@ -50,6 +50,8 @@
     <Compile Include="DayNightCycle.cs" />
     <Compile Include="DayNightCycleData.cs" />
     <Compile Include="Mod.cs" />
+    <Compile Include="ModUI.cs" />
+    <Compile Include="ModUIData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

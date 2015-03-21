@@ -1,6 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Xml.Serialization;
+using UnityEngine;
 
 namespace DayNightCycleMod
 {
@@ -14,29 +14,46 @@ namespace DayNightCycleMod
 
         public float TimeScale;
 
-        public DayNightCycleData(float dayTimeFactor, float duskDawnFactor, float nightTimeFactor, float timeScale)
+        public float MoonLightIntensityMultiplier;
+
+        public Color DaytimeSkyColor;
+        public Color MiddaySkyColor;
+        public Color NighttimeSkyColor;
+
+        public Color SunColor;
+        public Color MoonColor;
+
+        public ModUIData UIData;
+
+        public DayNightCycleData(Color moonColor, Color sunColor, Color nighttimeSkyColor, Color middaySkyColor, Color daytimeSkyColor, ModUIData data = null,
+                float moonLightIntensityMultiplier = 1, float timeScale = 10, float nightTimeFactor = 4, float duskDawnFactor = 1, float dayTimeFactor = 5)
         {
-            DayTimeFactor = dayTimeFactor;
-            DuskDawnFactor = duskDawnFactor;
+            MoonColor = moonColor;
+            SunColor = sunColor;
+            NighttimeSkyColor = nighttimeSkyColor;
+            MiddaySkyColor = middaySkyColor;
+            DaytimeSkyColor = daytimeSkyColor;
+
+            UIData = data ?? new ModUIData();
+
+            MoonLightIntensityMultiplier = moonLightIntensityMultiplier;
+            
             NightTimeFactor = nightTimeFactor;
+            DuskDawnFactor = duskDawnFactor;
+            DayTimeFactor = dayTimeFactor;
 
             ScaleDayPhases();
             TimeScale = timeScale;
         }
 
-        public DayNightCycleData()
-        {
-            DayTimeFactor = 5;
-            DuskDawnFactor = 1;
-            NightTimeFactor = 4;
-            TimeScale = 14;
-        }
+        public DayNightCycleData() 
+            : this(new Color(0.56f, 0.54f, 0.62f), new Color(1f, 1f, 0.7f), new Color(0.04f, 0.19f, 0.27f), new Color(0.58f, 0.88f, 1f), new Color(0.31f, 0.88f, 1f)) { }
 
         private void ScaleDayPhases()
         {
             // scale to make their sum 10
             var total = DayTimeFactor + DuskDawnFactor + NightTimeFactor;
-            if (Math.Abs(total - 10f) > float.Epsilon)
+            if (!Mathf.Approximately(total, 10))
             {
                 var scalingFactor = 10 / total;
                 DayTimeFactor *= scalingFactor;
@@ -57,6 +74,7 @@ namespace DayNightCycleMod
         public static DayNightCycleData Deserialize()
         {
             DayNightCycleData data;
+
             using (var stream = File.OpenRead(Path))
             {
                 var serializer = new XmlSerializer(typeof(DayNightCycleData));
@@ -64,6 +82,7 @@ namespace DayNightCycleMod
             }
 
             data.ScaleDayPhases();
+
             return data;
         }
     }

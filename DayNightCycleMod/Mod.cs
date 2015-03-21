@@ -13,6 +13,7 @@ namespace DayNightCycleMod
     public class ModLoading : LoadingExtensionBase
     {
         private DayNightCycle _cycle;
+
         public override void OnLevelLoaded(LoadMode mode)
         {
             if (mode != LoadMode.NewGame && mode != LoadMode.LoadGame)
@@ -20,13 +21,16 @@ namespace DayNightCycleMod
 
             var sunLight = Object.FindObjectOfType<Light>();
             var sun = sunLight.gameObject;
+
+            var moon = new GameObject("moon");
+            var moonLight = moon.AddComponent<Light>();
+            
             _cycle = sun.AddComponent<DayNightCycle>();
-            _cycle.Init(sunLight, managers.threading);
+            _cycle.Init(sunLight, moonLight);
         }
 
         public override void OnLevelUnloading()
         {
-            _cycle.enabled = false;
             _cycle.GetOptions().Serialize();
         }
     }
